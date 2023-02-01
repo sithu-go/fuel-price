@@ -28,9 +28,17 @@ func NewHandler(c *HConfig) *Handler {
 }
 
 func (h *Handler) Register() {
-	// Dashboard
-	// dashboardHandler := NewDashboardHandler(h)
-	// dashboardHandler.register()
+	// Division
+	divisionHandler := newDivisionHandler(h)
+	divisionHandler.register()
+
+	// Station
+	stationHandler := newStationHandler(h)
+	stationHandler.register()
+
+	// FuelLog
+	fuel_logHandler := newfuel_logHandler(h)
+	fuel_logHandler.register()
 
 	// crom poll
 

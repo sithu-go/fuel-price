@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/gin-gonic/gin v1.8.2
 	github.com/gocolly/colly v1.2.0
+	github.com/jinzhu/copier v0.3.5
 	github.com/joho/godotenv v1.4.0
 	github.com/robfig/cron/v3 v3.0.1
 	gorm.io/driver/mysql v1.4.5
