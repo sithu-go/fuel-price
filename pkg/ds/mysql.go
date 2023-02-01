@@ -2,7 +2,6 @@ package ds
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"fuel-price/pkg/model"
@@ -18,14 +17,10 @@ func LoadDB() (*gorm.DB, error) {
 	pass := os.Getenv("MYSQL_PASS")
 	name := os.Getenv("MYSQL_NAME")
 
-	log.Println(host, port, user, pass, name)
-
 	dsn := fmt.Sprintf(
 		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		user, pass, host, port, name,
 	)
-
-	log.Println(dsn)
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
