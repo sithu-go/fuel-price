@@ -3,6 +3,7 @@ package handler
 import (
 	"fuel-price/cmd/cronjob"
 	"fuel-price/pkg/ds"
+	"fuel-price/pkg/middleware"
 	"fuel-price/pkg/repository"
 
 	"github.com/gin-gonic/gin"
@@ -28,9 +29,11 @@ func NewHandler(c *HConfig) *Handler {
 }
 
 func (h *Handler) Register() {
-	// Dashboard
-	// dashboardHandler := NewDashboardHandler(h)
-	// dashboardHandler.register()
+	h.R.Use(middleware.Cors())
+
+	// Fuel
+	fuelHandler := newFuelHandler(h)
+	fuelHandler.register()
 
 	// crom poll
 

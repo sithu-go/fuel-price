@@ -8,7 +8,8 @@ type Repository struct {
 	DS       *ds.DataSource
 	Division *divisionRepository
 	Station  *stationRepository
-	FuelLog  *FuelLogRepository
+	FuelLog  *fuelLogRepository
+	Fuel     *fuelRepository
 }
 
 type RepoConfig struct {
@@ -22,5 +23,6 @@ func NewRepository(rConfig *RepoConfig) *Repository {
 		Division: newdivisionRepository(rConfig),
 		Station:  newStationRepository(rConfig),
 		FuelLog:  newFuelLogRepository(rConfig),
+		Fuel:     newFuelRepository(rConfig),
 	}
 }

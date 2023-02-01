@@ -1,70 +1,51 @@
 package repository
 
 import (
-	"context"
-	"fmt"
-	"fuel-price/pkg/dto"
+	"fuel-price/pkg/ds"
 	"fuel-price/pkg/model"
-	"fuel-price/pkg/utils"
+	"log"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
-type FuelLogRepository struct {
+type fuelRepository struct {
 	DB *gorm.DB
 }
 
-func newFuelLogRepository(rConfig *RepoConfig) *FuelLogRepository {
-	return &FuelLogRepository{
+func newFuelRepository(rConfig *RepoConfig) *fuelRepository {
+	return &fuelRepository{
 		DB: rConfig.DS.DB,
 	}
 }
 
-func (r *FuelLogRepository) FindByField(ctx context.Context, field, value any) (*model.FuelLog, error) {
-	db := r.DB.WithContext(ctx).Debug().Model(&model.FuelLog{})
-	FuelLog := model.FuelLog{}
-	err := db.First(&FuelLog, fmt.Sprintf("BINARY %s = ?", field), value).Error
-	return &FuelLog, err
-}
-
-func (r *FuelLogRepository) FindOrByField(ctx context.Context, field1, field2, value string) (*model.FuelLog, error) {
-	db := r.DB.WithContext(ctx).Model(&model.FuelLog{})
-	FuelLog := model.FuelLog{}
-	err := db.First(&FuelLog, fmt.Sprintf("%s = ? OR %s = ?", field1, field2), value, value).Error
-	return &FuelLog, err
-}
-
-func (r *FuelLogRepository) List(ctx context.Context, req *dto.SearchFuelLog) ([]*dto.ResponseFuelLog, int64, error) {
-	var list []*dto.ResponseFuelLog
-	db := r.DB.Debug().Table("fuel_logs")
-	db.Select("fuel_logs.*, stations.name as division")
-	// db.Joins("JOIN app_clients ON app_clients.client_id = clients.id")
-	db.Joins("LEFT JOIN division ON stations.id = fuel_logs.division_id")
-	db.Where("fuel_logs.deleted_at IS NULL")
-	if req.ID != 0 {
-		db.Where("id", req.ID)
+func (r *fuelRepository) GetFuelPrices() {
+	tb := ds.DB.Debug().Model(&model.FuelLog{})
+	filterToQuery(tb)
+	prices := make([]*model.Division, 0)
+	if err := tb.Preload(clause.Associations).Find(&prices).Error; err != nil {
+		log.Println(err)
+		return
 	}
-	var total int64
-	db.Count(&total)
-	if err := db.Scopes(utils.Paginate(req.Page, req.PageSize)).Find(&list).Error; err != nil {
-		return nil, 0, err
-	}
-	return list, total, nil
+
+	log.Println(prices)
+
 }
 
-func (r *FuelLogRepository) Create(ctx context.Context, station *model.FuelLog) error {
-	db := r.DB.WithContext(ctx).Debug().Model(&model.FuelLog{})
-	return db.Create(&station).Error
+// utilities start
+func filterToQuery(tb *gorm.DB) {
+	// tb.Table("divisions AS d")
+	// tb.Joins("LEFT JOIN stations s ON s.division_id = d.id")
+	// tb.Joins("LEFT JOIN fuel_logs fl ON fl.station_id = s.id")
+	// tb.Order("s.created_at")
+	// tb.Group("fl.station_id")
+
+	tb.Table("fuel_logs AS fl")
+	tb.Joins("LEFT JOIN stations s ON fl.station_id = s.id")
+	tb.Joins("LEFT JOIN divisions d ON s.division_id = d.id")
+	tb.Order("s.created_at")
+	tb.Group("fl.station_id")
+
 }
 
-func (r *FuelLogRepository) Update(ctx context.Context, updateFields *model.UpdateFields) error {
-	db := r.DB.WithContext(ctx).Debug().Model(&model.FuelLog{})
-	db.Where(updateFields.Field, updateFields.Value)
-	return db.Updates(&updateFields.Data).Error
-}
-
-func (r *FuelLogRepository) Delete(ctx context.Context, ids string) error {
-	db := r.DB.WithContext(ctx).Debug().Model(&model.FuelLog{})
-	db.Where(fmt.Sprintf("id in (%s)", ids))
-	return db.Delete(&model.FuelLog{}).Error
-}
+// utilities end
