@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fuel-price/cmd/cronjob"
 	"fuel-price/pkg/ds"
 	"fuel-price/pkg/repository"
 
@@ -30,5 +31,14 @@ func (h *Handler) Register() {
 	// Dashboard
 	// dashboardHandler := NewDashboardHandler(h)
 	// dashboardHandler.register()
+
+	// crom poll
+
+	pool := cronjob.NewCronPool(&cronjob.CronConfig{
+		DB:   h.repo.DS.DB,
+		Repo: h.repo,
+	})
+
+	pool.StartCronPool()
 
 }
