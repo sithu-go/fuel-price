@@ -34,6 +34,17 @@ func (h *Handler) Register() {
 	// Fuel
 	fuelHandler := newFuelHandler(h)
 	fuelHandler.register()
+	// Division
+	divisionHandler := newDivisionHandler(h)
+	divisionHandler.register()
+
+	// Station
+	stationHandler := newStationHandler(h)
+	stationHandler.register()
+
+	// FuelLog
+	fuel_logHandler := newfuel_logHandler(h)
+	fuel_logHandler.register()
 
 	// crom poll
 

@@ -46,3 +46,12 @@ type ResponseFuelLog struct {
 	UpdatedAt     time.Time      `json:"updated_at"`
 	DeletedAt     gorm.DeletedAt `json:"-"`
 }
+
+type FuelPriceFilter struct {
+	Page         int    `json:"page" form:"page" binding:"required"`
+	PageSize     int    `json:"page_size" form:"page_size" binding:"required"`
+	DivisionId   string `json:"division_id" form:"division_id"`
+	DivisionName string `json:"division_name" form:"division_name"`
+	StationId    string `json:"station_id" form:"station_id"`
+	StationName  string `json:"station_name" form:"station_name"`
+}
