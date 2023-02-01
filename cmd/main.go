@@ -26,7 +26,7 @@ func main() {
 	flag.Parse()
 	addr := fmt.Sprintf(":%s", *port)
 
-	gin.SetMode(gin.ReleaseMode)
+	// gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 
 	ds, _ := ds.NewDataSource()
