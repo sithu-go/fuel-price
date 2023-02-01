@@ -7,6 +7,8 @@ import (
 type Repository struct {
 	DS       *ds.DataSource
 	Division *divisionRepository
+	Station  *stationRepository
+	FuelLog  *FuelLogRepository
 }
 
 type RepoConfig struct {
@@ -18,5 +20,7 @@ func NewRepository(rConfig *RepoConfig) *Repository {
 	return &Repository{
 		DS:       rConfig.DS,
 		Division: newdivisionRepository(rConfig),
+		Station:  newStationRepository(rConfig),
+		FuelLog:  newFuelLogRepository(rConfig),
 	}
 }
