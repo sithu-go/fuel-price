@@ -14,10 +14,12 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"fuel-price/cmd/handler"
+	_ "fuel-price/conf"
 	"fuel-price/pkg/ds"
 )
 
 func main() {
+
 	// to get file line and path when print
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	port := flag.String("port", "8080", "default port is 8080")
