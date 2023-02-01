@@ -3,7 +3,9 @@ package repository
 import (
 	"context"
 	"fmt"
+	"fuel-price/pkg/dto"
 	"fuel-price/pkg/model"
+	"fuel-price/pkg/utils"
 
 	"gorm.io/gorm"
 )
@@ -20,58 +22,48 @@ func newdivisionRepository(rConfig *RepoConfig) *divisionRepository {
 
 func (r *divisionRepository) FindByField(ctx context.Context, field, value any) (*model.Division, error) {
 	db := r.DB.WithContext(ctx).Debug().Model(&model.Division{})
-	admin := model.Division{}
-	err := db.First(&admin, fmt.Sprintf("BINARY %s = ?", field), value).Error
-	return &admin, err
+	division := model.Division{}
+	err := db.First(&division, fmt.Sprintf("BINARY %s = ?", field), value).Error
+	return &division, err
 }
 
 func (r *divisionRepository) FindOrByField(ctx context.Context, field1, field2, value string) (*model.Division, error) {
 	db := r.DB.WithContext(ctx).Model(&model.Division{})
-	admin := model.Division{}
-	err := db.First(&admin, fmt.Sprintf("%s = ? OR %s = ?", field1, field2), value, value).Error
-	return &admin, err
+	division := model.Division{}
+	err := db.First(&division, fmt.Sprintf("%s = ? OR %s = ?", field1, field2), value, value).Error
+	return &division, err
 }
 
-// func (r *divisionRepository) List(ctx context.Context, req *dto.AdminSS) ([]*dto.ResponseAdmin, int64, error) {
-// 	var list []*dto.ResponseAdmin
-// 	db := r.DB.Debug().Table("admins")
+func (r *divisionRepository) List(ctx context.Context, req *dto.SearchDivision) ([]*dto.ResponseDivision, int64, error) {
+	var list []*dto.ResponseDivision
+	db := r.DB.WithContext(ctx).Debug().Model(&model.Division{})
+	if req.ID != 0 {
+		db.Where("id", req.ID)
+	}
+	if req.Name != "" {
+		db.Where("name LIKE ?", "%"+req.Name+"%")
+	}
+	var total int64
+	db.Count(&total)
+	if err := db.Scopes(utils.Paginate(req.Page, req.PageSize)).Find(&list).Error; err != nil {
+		return nil, 0, err
+	}
+	return list, total, nil
+}
 
-// 	db.Select("admins.*, roles.name as role_name")
-// 	// db.Joins("JOIN app_clients ON app_clients.client_id = clients.id")
-// 	db.Joins("LEFT JOIN roles ON admins.role_id = roles.id")
-// 	db.Where("admins.deleted_at IS NULL")
-// 	if req.ID != 0 {
-// 		db.Where("admins.id", req.ID)
-// 	}
-// 	if req.Username != "" {
-// 		db.Where("admins.username LIKE ?", "%"+req.Username+"%")
-// 	}
-// 	if req.Email != "" {
-// 		db.Where("admins.email LIKE ?", "%"+req.Email+"%")
-// 	}
-// 	var total int64
-// 	db.Count(&total)
-// 	if err := db.Scopes(utils.Paginate(req.Page, req.PageSize)).Find(&list).Error; err != nil {
-// 		return nil, 0, err
-// 	}
-// 	return list, total, nil
-// }
+func (r *divisionRepository) Create(ctx context.Context, division *model.Division) error {
+	db := r.DB.WithContext(ctx).Debug().Model(&model.Division{})
+	return db.Create(&division).Error
+}
 
-// func (r *divisionRepository) Create(ctx context.Context, admin *model.Division) error {
-// 	tb := r.DB.WithContext(ctx).Debug().Model(&model.Division{})
-// 	var count int64
-// 	var oldAdmin model.Admin
-// 	tb.Unscoped().Where("username = ? AND deleted_at IS NOT NULL", admin.Username).Count(&count).First(&oldAdmin)
-// 	if count > 0 {
-// 		admin.ID = oldAdmin.ID
-// 		admin.CreatedAt = time.Now()
-// 		admin.UpdatedAt = time.Now()
-// 		admin.DeletedAt = gorm.DeletedAt{
-// 			Time:  time.Time{},
-// 			Valid: false,
-// 		}
-// 		return tb.Save(&admin).Error
-// 	}
-// 	db := r.DB.WithContext(ctx).Debug().Model(&model.Division{})
-// 	return db.Create(&admin).Error
-// }
+func (r *divisionRepository) Update(ctx context.Context, updateFields *model.UpdateFields) error {
+	db := r.DB.WithContext(ctx).Debug().Model(&model.Division{})
+	db.Where(updateFields.Field, updateFields.Value)
+	return db.Updates(&updateFields.Data).Error
+}
+
+func (r *divisionRepository) Delete(ctx context.Context, ids string) error {
+	db := r.DB.WithContext(ctx).Debug().Model(&model.Division{})
+	db.Where(fmt.Sprintf("id in (%s)", ids))
+	return db.Delete(&model.Division{}).Error
+}
