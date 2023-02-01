@@ -4,7 +4,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type Fuel struct {
+type FuelLog struct {
 	gorm.Model
 	StationId     uint64 `gorm:"column:station_id" json:"station_id"`
 	DiselPrice    uint64 `gorm:"column:disel_price;" json:"disel_price"`

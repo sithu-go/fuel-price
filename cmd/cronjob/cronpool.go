@@ -30,12 +30,12 @@ func NewCronPool(cronConfig *CronConfig) *cronPool {
 }
 
 func (c *cronPool) StartCronPool() {
-	c.cronJob.AddFunc("0 */4 * * *", c.crawlFuelPrice) // at every 4th hour
+	c.cronJob.AddFunc("0 */4 * * *", c.crawlFuelPrices) // at every 4th hour
 
 	c.cronJob.Start()
 }
 
-func (c *cronPool) crawlFuelPrice() {
+func (c *cronPool) crawlFuelPrices() {
 	log.Println("HEHE")
 
 	go func() {

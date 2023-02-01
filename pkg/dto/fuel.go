@@ -6,14 +6,14 @@ import (
 	"gorm.io/gorm"
 )
 
-type CreateFuel struct {
+type CreateFuelLog struct {
 	StationId     uint64 `form:"station_id"  json:"station_id"`
 	DiselPrice    uint64 `form:"disel_pirce"  json:"disel_pirce"`
 	PreDiselPrice uint64 `form:"pre_disel_price"  json:"pre_disel_price"`
 	O95Price      uint64 `form:"o95_price"  json:"o95_price"`
 	O92Price      uint64 `form:"o92_price"  json:"o92_price"`
 }
-type UpdateFuel struct {
+type UpdateFuelLog struct {
 	ID            uint64 `form:"id" json:"id" binding:"required"`
 	StationId     uint64 `form:"station_id"  json:"station_id" binding:"required"`
 	DiselPrice    uint64 `form:"disel_pirce"  json:"disel_pirce"`
@@ -22,7 +22,7 @@ type UpdateFuel struct {
 	O92Price      uint64 `form:"o92_price"  json:"o92_price"`
 }
 
-type SearchFuel struct {
+type SearchFuelLog struct {
 	ID            uint64    `form:"id" json:"id"`
 	StationId     uint64    `form:"station_id"  json:"station_id"`
 	DiselPrice    uint64    `form:"disel_pirce"  json:"disel_pirce"`
@@ -35,7 +35,7 @@ type SearchFuel struct {
 	PageSize      int       `json:"page_size" form:"page_size"`
 }
 
-type ResponseFuel struct {
+type ResponseFuelLog struct {
 	ID            uint64         `json:"id"`
 	StationId     uint64         `json:"station_id"`
 	DiselPrice    uint64         `json:"disel_pirce"`
