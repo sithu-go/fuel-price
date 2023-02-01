@@ -1,7 +1,6 @@
 package service
 
 import (
-	"log"
 	"strconv"
 
 	"github.com/gocolly/colly"
@@ -15,9 +14,9 @@ type StationFuelPrice struct {
 	Octance95     uint64
 }
 
-func CrawlFuelPrices() {
+func CrawlFuelPrices() (map[string][]*StationFuelPrice, error) {
 
-	fuelPrices := map[string][]StationFuelPrice{}
+	fuelPrices := map[string][]*StationFuelPrice{}
 	c := colly.NewCollector()
 
 	var division string
@@ -31,8 +30,6 @@ func CrawlFuelPrices() {
 		h.ForEach("td", func(i int, h *colly.HTMLElement) {
 			switch i {
 			case 0:
-				// fuelPrices[h.Text] = []*StationFuelPrice{}
-				// log.Println(len(h.Text), h.Text, "DI")
 				if len(h.Text) != 0 {
 					division = h.Text
 				}
@@ -61,13 +58,14 @@ func CrawlFuelPrices() {
 			Octance92:     octance92Price,
 			Octance95:     octance95Price,
 		}
-		fuelPrices[division] = append(fuelPrices[division], stationFuelPrices)
+		fuelPrices[division] = append(fuelPrices[division], &stationFuelPrices)
 
 	})
 
-	c.Visit("https://denkomyanmar.com/all-denko-station-daily-fuel-rates/")
+	if err := c.Visit("https://denkomyanmar.com/all-denko-station-daily-fuel-rates/"); err != nil {
 
-	for _, k := range fuelPrices["Shan State"] {
-		log.Println(k, "HEHE")
+		return nil, err
+
 	}
+	return fuelPrices, nil
 }
