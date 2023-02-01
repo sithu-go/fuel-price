@@ -38,7 +38,7 @@ func LoadDB() (*gorm.DB, error) {
 	err = db.AutoMigrate(
 		&model.Division{},
 		&model.Station{},
-		&model.FuelLog{},
+		&model.Fuel{},
 	)
 	if err != nil {
 		return nil, err
